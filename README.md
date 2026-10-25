@@ -19,3 +19,13 @@ free. This package only adds what SwiftUI doesn't have:
 
 Rules: status is never shown by color alone; every control is at least 44 points; text
 must survive the largest accessibility sizes; colors meet WCAG AA in light and dark.
+
+## Adopting it in an app (Grocery Deals is next)
+
+1. In the app's `project.yml`: add `KitchenUI: path: <relative path to ~/Developer/KitchenUI>` under `packages` and `- package: KitchenUI` under the target's dependencies; run `xcodegen generate`.
+2. Call `KitchenUI.registerFonts()` in the App's `init()`. Remove bundled fonts and `UIAppFonts` the package replaces.
+3. Map the app's own Theme to `Palette` (as Pantry's `Theme.swift` does) so screens keep compiling, then replace hard-coded colors with tokens and remove any forced `.preferredColorScheme`.
+4. Swap hand-built pieces for SwiftUI's own (ContentUnavailableView, bordered/prominent buttons, Label, LabeledContent) and the package's FilterChip/ChipRow/Badge/Card.
+5. Check every screen at the largest accessibility text size and in dark mode; keep 44-point targets and VoiceOver labels.
+
+Pantry's commits on its `app-scaffold` branch ("Design cleanup: adopt KitchenUI…", "Chat screens on KitchenUI…") are a worked example.
