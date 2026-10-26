@@ -14,6 +14,9 @@ free. This package only adds what SwiftUI doesn't have:
 - **Shape and space:** `Radius`, `Space`.
 - **Components:** `FilterChip`, `ChipRow`, `Badge` (shape + label + tone, never color alone),
   `Card`, `SectionHeader`, `FlowLayout`, `AdaptiveStack`.
+- **Appearance:** `.kitchenAppearance()` on the root view applies the Light/Dark and text size
+  people choose in the app (both follow the iPhone by default); `AppearanceSettings()` is the
+  Settings rows, wrapped in the app's own `Section`.
 - **Accessibility helpers:** `Announce.say(_:)`, `.lineLimitUnlessLarge(_:)`,
   `.hiddenWhenTextIsLarge()`.
 
@@ -23,7 +26,7 @@ must survive the largest accessibility sizes; colors meet WCAG AA in light and d
 ## Adopting it in an app (Grocery Deals is next)
 
 1. In the app's `project.yml`: add `KitchenUI: path: <relative path to ~/Developer/KitchenUI>` under `packages` and `- package: KitchenUI` under the target's dependencies; run `xcodegen generate`.
-2. Call `KitchenUI.registerFonts()` in the App's `init()`. Remove bundled fonts and `UIAppFonts` the package replaces.
+2. Call `KitchenUI.registerFonts()` in the App's `init()` and add `.kitchenAppearance()` to the root view. Remove bundled fonts and `UIAppFonts` the package replaces.
 3. Map the app's own Theme to `Palette` (as Pantry's `Theme.swift` does) so screens keep compiling, then replace hard-coded colors with tokens and remove any forced `.preferredColorScheme`.
 4. Swap hand-built pieces for SwiftUI's own (ContentUnavailableView, bordered/prominent buttons, Label, LabeledContent) and the package's FilterChip/ChipRow/Badge/Card.
 5. Check every screen at the largest accessibility text size and in dark mode; keep 44-point targets and VoiceOver labels.
