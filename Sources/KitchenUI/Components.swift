@@ -104,23 +104,30 @@ public struct Card<Content: View>: View {
     }
 }
 
-/// An uppercase section header with an optional count: "FRIDGE · 91".
+/// An uppercase section header with an optional count: "FRIDGE · 91". With `chevron`, it reads
+/// as a way in ("H MART · 18 DEALS ›"); wrap it in a NavigationLink or Button.
 public struct SectionHeader: View {
     let text: String
     var trailing: String?
+    var chevron: Bool
 
-    public init(_ text: String, trailing: String? = nil) {
+    public init(_ text: String, trailing: String? = nil, chevron: Bool = false) {
         self.text = text
         self.trailing = trailing
+        self.chevron = chevron
     }
 
     public var body: some View {
-        HStack(alignment: .firstTextBaseline) {
+        HStack(alignment: .firstTextBaseline, spacing: Space.xs) {
             Text(text.uppercased()).font(.app(13, .bold, relativeTo: .caption)).tracking(0.8)
             Spacer()
-            if let trailing { Text(trailing).font(.app(13, relativeTo: .caption)) }
+            if let trailing { Text(trailing).font(.app(13, relativeTo: .caption)).monospacedDigit() }
+            if chevron {
+                Image(systemName: "chevron.right").font(.app(12, .bold, relativeTo: .caption)).accessibilityHidden(true)
+            }
         }
         .foregroundStyle(Palette.muted)
+        .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
     }
