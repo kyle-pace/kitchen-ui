@@ -167,3 +167,15 @@ public struct FlowLayout: Layout {
         return rows
     }
 }
+
+extension View {
+    /// Fills a box of this size and crops to it, without pushing the layout wider. (A
+    /// `.scaledToFill()` image on its own takes the photo's width and breaks grids and rows.)
+    public func fillFrame(width: CGFloat? = nil, height: CGFloat? = nil) -> some View {
+        Color.clear
+            .frame(width: width, height: height)
+            .frame(maxWidth: width == nil ? .infinity : width)
+            .overlay { self }
+            .clipped()
+    }
+}
