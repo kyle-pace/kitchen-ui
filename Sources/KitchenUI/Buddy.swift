@@ -142,9 +142,9 @@ struct BuddyBody: View {
                     RoundedRectangle(cornerRadius: s * 0.16).fill(BuddyColors.glass)
                         .overlay(RoundedRectangle(cornerRadius: s * 0.16).strokeBorder(BuddyColors.glassEdge, lineWidth: max(1.5, s * 0.025)))
                         .frame(width: s * 0.66, height: s * 0.62).offset(y: s * 0.13)
-                    // A glint
+                    // A glint, low on the left so it never touches the face
                     Capsule().fill(.white.opacity(0.55))
-                        .frame(width: s * 0.05, height: s * 0.2).offset(x: -s * 0.22, y: s * 0.05)
+                        .frame(width: s * 0.05, height: s * 0.12).offset(x: -s * 0.24, y: s * 0.3)
                 }
                 .frame(width: s, height: s)
             }

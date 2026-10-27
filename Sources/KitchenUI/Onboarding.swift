@@ -142,9 +142,10 @@ public struct Onboarding: View {
                 }
                 .multilineTextAlignment(.center)
             }
+            .padding(.horizontal, Space.xl)
             .frame(maxWidth: .infinity)
         } buttons: {
-            Button { go(.tour) } label: { wide("Take the tour") }
+            Button { go(.tour) } label: { wide("Take the tour", prominent: true) }
                 .buttonStyle(.borderedProminent)
             Button { tour = .skipped; go(.question) } label: { wide("Skip the tour") }
                 .buttonStyle(.bordered)
@@ -184,7 +185,7 @@ public struct Onboarding: View {
                     Button { page -= 1 } label: { wide("Back") }
                         .buttonStyle(.bordered)
                 }
-                Button { next() } label: { wide(isLastPage ? (start == .tourOnly ? "Done" : "Continue") : "Next") }
+                Button { next() } label: { wide(isLastPage ? (start == .tourOnly ? "Done" : "Continue") : "Next", prominent: true) }
                     .buttonStyle(.borderedProminent)
             }
         }
@@ -271,9 +272,12 @@ public struct Onboarding: View {
         onFinish(OnboardingResult(shareUsage: share, tour: tour, pagesSeen: seen.count))
     }
 
-    private func wide(_ title: String) -> some View {
+    /// A full-width button label. `prominent` labels sit on the accent fill, so they take
+    /// `onAccent`: white on the light-mode green, dark on the brighter dark-mode green.
+    private func wide(_ title: String, prominent: Bool = false) -> some View {
         Text(title)
             .font(.app(.headline))
+            .foregroundStyle(prominent ? AnyShapeStyle(Palette.onAccent) : AnyShapeStyle(.tint))
             .frame(maxWidth: .infinity, minHeight: 44)
     }
 }
