@@ -17,6 +17,13 @@ free. This package only adds what SwiftUI doesn't have:
 - **Appearance:** `.kitchenAppearance()` on the root view applies the Light/Dark and text size
   people choose in the app (both follow the iPhone by default); `AppearanceSettings()` is the
   Settings rows, wrapped in the app's own `Section`.
+- **Onboarding:** `Onboarding(buddy:appName:tagline:pages:question:start:onFinish:)`, the first-run
+  flow both apps use: a welcome, a tour of `TourPage`s, then a `UsageQuestion` about anonymous
+  analytics. Everything but the question can be skipped from every screen; the question has two
+  equal buttons and nothing chosen ahead of time. `start: .question` asks only the question
+  (people who used the app before onboarding existed); `.tourOnly` replays the tour from
+  Settings. No system permission prompts here: ask for those when someone uses the feature.
+  The app saves the answer and sends nothing before a yes.
 - **Accessibility helpers:** `Announce.say(_:)`, `.lineLimitUnlessLarge(_:)`,
   `.hiddenWhenTextIsLarge()`.
 
