@@ -44,3 +44,11 @@ must survive the largest accessibility sizes; colors meet WCAG AA in light and d
 5. Check every screen at the largest accessibility text size and in dark mode; keep 44-point targets and VoiceOver labels.
 
 Pantry's commits on its `app-scaffold` branch ("Design cleanup: adopt KitchenUI…", "Chat screens on KitchenUI…") are a worked example.
+
+## Installing the apps on your iPhone
+
+`tools/phone` builds the dev versions ("Deals Dev", "On Hand Dev", DEV icons) and installs them
+on the plugged-in or Wi-Fi-paired iPhone: `phone`, `phone deals`, `phone onhand`, plus
+`phone pull` (fast-forward every repo) and `phone status`. It builds whatever each repo in
+`~/Developer` has checked out. Install once with
+`ln -sf ~/Developer/KitchenUI/tools/phone ~/.local/bin/phone`.
