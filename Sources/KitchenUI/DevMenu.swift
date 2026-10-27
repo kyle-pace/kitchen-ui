@@ -35,26 +35,39 @@ public enum BuildKind: String, Sendable {
     }
 }
 
+/// The build kind, worked out once and observable, so a view can show or hide itself when the
+/// answer arrives. (A `.task` on a view with nothing in it never runs.)
+@MainActor @Observable
+public final class BuildInfo {
+    public static let shared = BuildInfo()
+    public private(set) var kind: BuildKind?
+    @ObservationIgnored private var started = false
+
+    public func resolve() {
+        guard !started else { return }
+        started = true
+        Task { kind = await BuildKind.current() }
+    }
+}
+
 /// A Settings section with a "Developer" row, shown only on builds that allow it.
 public struct DevMenuSection<Menu: View>: View {
-    @State private var build: BuildKind?
     let menu: () -> Menu
 
     public init(@ViewBuilder menu: @escaping () -> Menu) { self.menu = menu }
 
     public var body: some View {
-        Group {
-            if build?.showsDevMenu == true {
-                Section {
-                    NavigationLink { menu() } label: {
-                        Label("Developer", systemImage: "hammer")
-                    }
-                } footer: {
-                    Text("\(build?.rawValue ?? "") build. Not shown in the App Store version.")
+        let info = BuildInfo.shared
+        let _ = info.resolve()
+        if let kind = info.kind, kind.showsDevMenu {
+            Section {
+                NavigationLink { menu() } label: {
+                    Label("Developer", systemImage: "hammer")
                 }
+            } footer: {
+                Text("\(kind.rawValue) build. Not in the App Store version.")
             }
         }
-        .task { build = await BuildKind.current() }
     }
 }
 
@@ -95,7 +108,6 @@ public struct DevMenu<AppSections: View>: View {
     let resetAll: (() -> Void)?
     let appSections: AppSections
 
-    @State private var build: BuildKind?
     @State private var info: DevAnalytics?
     @State private var note: String?
     @State private var confirmReset = false
@@ -164,7 +176,6 @@ public struct DevMenu<AppSections: View>: View {
         .background(Palette.ground)
         .navigationTitle("Developer")
         .navigationBarTitleDisplayMode(.inline)
-        .task { build = await BuildKind.current() }
         .confirmationDialog("Reset everything?", isPresented: $confirmReset, titleVisibility: .visible) {
             Button("Reset", role: .destructive) {
                 resetAll?()
@@ -174,6 +185,8 @@ public struct DevMenu<AppSections: View>: View {
             Text("This app's settings and data on this iPhone are cleared. Reminders lists and calendars aren't touched.")
         }
     }
+
+    private var build: BuildKind? { BuildInfo.shared.kind }
 
     private static var version: String {
         let info = Bundle.main.infoDictionary
