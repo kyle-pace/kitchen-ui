@@ -179,7 +179,7 @@ public struct Onboarding: View {
                     .accessibilityHint(start == .tourOnly ? "Closes the tour" : "Goes straight to the last step")
             }
         } buttons: {
-            HStack(spacing: Space.m) {
+            AdaptiveStack(spacing: Space.m) {
                 if page > 0 {
                     Button { page -= 1 } label: { wide("Back") }
                         .buttonStyle(.bordered)
