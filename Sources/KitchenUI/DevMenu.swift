@@ -111,6 +111,7 @@ public struct DevMenu<AppSections: View>: View {
     @State private var info: DevAnalytics?
     @State private var note: String?
     @State private var confirmReset = false
+    @State private var bubble = DevBubble.isEnabled
 
     public init(onboarding: DevOnboarding, analytics: @escaping () -> DevAnalytics,
                 resetAll: (() -> Void)? = nil, @ViewBuilder appSections: () -> AppSections) {
@@ -124,6 +125,14 @@ public struct DevMenu<AppSections: View>: View {
         Form {
             if let note {
                 Section { Label(note, systemImage: "checkmark.circle").foregroundStyle(Palette.text(.good)) }
+            }
+
+            Section {
+                Toggle("Floating button", isOn: $bubble)
+                    .tint(Palette.accent)
+                    .onChange(of: bubble) { _, on in DevBubble.isEnabled = on }
+            } footer: {
+                Text("The hammer dot on every screen. Drag it to either edge; long-press it to hide it until the app opens again.")
             }
 
             Section {

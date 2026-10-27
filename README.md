@@ -29,6 +29,10 @@ free. This package only adds what SwiftUI doesn't have:
   Store builds, see `BuildKind`). Shared rows: show onboarding or the usage question, forget the
   answer, analytics status, device ID and flush, build details, reset everything. Apps add their
   own sections with `DevAction` rows.
+  `.devMenuButton { AppDevMenu().environment(…) }` on the root view adds a floating hammer dot
+  above every screen (its own window, so it floats over sheets too) on the same builds: tap for
+  the menu, drag to either edge, long-press to hide until the app reopens; a switch in the menu
+  turns it off.
 - **Accessibility helpers:** `Announce.say(_:)`, `.lineLimitUnlessLarge(_:)`,
   `.hiddenWhenTextIsLarge()`.
 
