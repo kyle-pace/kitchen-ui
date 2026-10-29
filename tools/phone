@@ -1,0 +1,50 @@
+#!/bin/sh
+# phone: build the dev versions of the kitchen apps and install them on your iPhone. The dev
+# builds are "Deals Dev" and "On Hand Dev" with a DEV icon, so they sit next to the real apps.
+#
+#   phone            both apps
+#   phone deals      Deals Dev only
+#   phone onhand     On Hand Dev only
+#   phone pull       fast-forward every repo's current branch (skips any with local changes)
+#   phone status     branch and commit of each repo, and whether the iPhone is reachable
+#
+# Builds whatever each repo has checked out. The repos sit side by side in ~/Developer (set
+# KITCHEN_DIR to change): KitchenUI, KitchenCatalog, PantryApp (on-hand) and
+# seattle-grocery-deals. The phone can be plugged in, or paired over Wi-Fi in Xcode's Devices
+# window; either way unlocked and trusted.
+#
+# Install once: ln -sf ~/Developer/KitchenUI/tools/phone ~/.local/bin/phone
+set -e
+DIR="${KITCHEN_DIR:-$HOME/Developer}"
+REPOS="KitchenUI KitchenCatalog PantryApp seattle-grocery-deals"
+
+deals() { "$DIR/seattle-grocery-deals/apple/install-on-iphone.sh" "$@"; }
+onhand() { "$DIR/PantryApp/App/install-on-iphone.sh" "$@"; }
+
+status() {
+  for r in $REPOS; do
+    [ -d "$DIR/$r/.git" ] || { printf '%-22s missing\n' "$r"; continue; }
+    changes=$(git -C "$DIR/$r" status --porcelain | wc -l | tr -d ' ')
+    printf '%-22s %-14s %s%s\n' "$r" "$(git -C "$DIR/$r" rev-parse --abbrev-ref HEAD)" \
+      "$(git -C "$DIR/$r" log -1 --format='%h %s' | cut -c1-60)" "$( [ "$changes" != 0 ] && echo " ($changes changed)")"
+  done
+  for x in "$HOME/Downloads/Xcode Beta.app" /Applications/Xcode-beta.app "/Applications/Xcode Beta.app" /Applications/Xcode.app; do
+    [ -d "$x" ] && export DEVELOPER_DIR="$x/Contents/Developer" && break
+  done
+  phone=$(xcrun devicectl list devices 2>/dev/null | awk '!/simulated/ && (/available/ || /connected/) && /[0-9A-F]{8}-[0-9A-F]{16}/ { print $1; exit }')
+  echo "iPhone: ${phone:-not found (plug it in, unlock it)}"
+}
+
+pull() {
+  for r in $REPOS; do
+    if [ -n "$(git -C "$DIR/$r" status --porcelain)" ]; then echo "$r: local changes, skipped"; continue; fi
+    git -C "$DIR/$r" pull -q --ff-only && echo "$r: $(git -C "$DIR/$r" log -1 --format='%h %s' | cut -c1-60)" \
+      || echo "$r: can't fast-forward, skipped"
+  done
+}
+
+case "${1:-all}" in
+  all) deals --no-open && onhand ;;
+  deals|onhand|pull|status) cmd=$1; shift; $cmd "$@" ;;
+  *) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

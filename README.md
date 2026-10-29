@@ -17,6 +17,22 @@ free. This package only adds what SwiftUI doesn't have:
 - **Appearance:** `.kitchenAppearance()` on the root view applies the Light/Dark and text size
   people choose in the app (both follow the iPhone by default); `AppearanceSettings()` is the
   Settings rows, wrapped in the app's own `Section`.
+- **Onboarding:** `Onboarding(buddy:appName:tagline:pages:question:start:onFinish:)`, the first-run
+  flow both apps use: a welcome, a tour of `TourPage`s, then a `UsageQuestion` about anonymous
+  analytics. Everything but the question can be skipped from every screen; the question has two
+  equal buttons and nothing chosen ahead of time. `start: .question` asks only the question
+  (people who used the app before onboarding existed); `.tourOnly` replays the tour from
+  Settings. No system permission prompts here: ask for those when someone uses the feature.
+  The app saves the answer and sends nothing before a yes.
+- **Dev menu:** `DevMenuSection { DevMenu(onboarding:analytics:resetAll:) { app sections } }` in
+  Settings adds a "Developer" row on Debug, development-signed and TestFlight builds (never App
+  Store builds, see `BuildKind`). Shared rows: show onboarding or the usage question, forget the
+  answer, analytics status, device ID and flush, build details, reset everything. Apps add their
+  own sections with `DevAction` rows.
+  `.devMenuButton { AppDevMenu().environment(…) }` on the root view adds a floating hammer dot
+  above every screen (its own window, so it floats over sheets too) on the same builds: tap for
+  the menu, drag to either edge, long-press to hide until the app reopens; a switch in the menu
+  turns it off.
 - **Accessibility helpers:** `Announce.say(_:)`, `.lineLimitUnlessLarge(_:)`,
   `.hiddenWhenTextIsLarge()`.
 
@@ -32,3 +48,11 @@ must survive the largest accessibility sizes; colors meet WCAG AA in light and d
 5. Check every screen at the largest accessibility text size and in dark mode; keep 44-point targets and VoiceOver labels.
 
 Pantry's commits on its `app-scaffold` branch ("Design cleanup: adopt KitchenUI…", "Chat screens on KitchenUI…") are a worked example.
+
+## Installing the apps on your iPhone
+
+`tools/phone` builds the dev versions ("Deals Dev", "On Hand Dev", DEV icons) and installs them
+on the plugged-in or Wi-Fi-paired iPhone: `phone`, `phone deals`, `phone onhand`, plus
+`phone pull` (fast-forward every repo) and `phone status`. It builds whatever each repo in
+`~/Developer` has checked out. Install once with
+`ln -sf ~/Developer/KitchenUI/tools/phone ~/.local/bin/phone`.
