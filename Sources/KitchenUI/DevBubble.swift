@@ -3,7 +3,8 @@ import UIKit
 
 // The floating dev button: a small dot that stays above every screen, sheets and full-screen
 // covers included, on Debug, development and TestFlight builds (never App Store builds).
-// Tap it for the dev menu, drag it to either edge, long-press to hide it until the app reopens.
+// It rests as a see-through tab on the left edge. Tap it for the dev menu, drag it to either
+// edge, long-press to hide it until the app reopens.
 // The dev menu has a switch to turn it off for good.
 //
 //     RootView().devMenuButton { AppDevMenu().environment(store) }
@@ -48,10 +49,14 @@ private struct DevBubbleInstaller: UIViewRepresentable {
 public final class DevBubble {
     public static let shared = DevBubble()
     private static let enabledKey = "kitchen.dev.bubble"
-    private static let sideKey = "kitchen.dev.bubbleSide"     // "left" or "right"
-    private static let heightKey = "kitchen.dev.bubbleY"      // 0 at the top to 1 at the bottom
-    private static let size: CGFloat = 48
+    // v2 keys (Oct 28): the dot moved from over the right-hand + buttons to a tab on the left
+    // edge, so old saved spots start over.
+    private static let sideKey = "kitchen.dev.bubbleSide.v2"     // "left" or "right"
+    private static let heightKey = "kitchen.dev.bubbleY.v2"      // 0 at the top to 1 at the bottom
+    private static let size: CGFloat = 40
     private static let margin: CGFloat = 8
+    /// How much of the dot tucks past the screen edge, so it covers the side margin, not content.
+    private static let tuck: CGFloat = 0.4
 
     /// The dev menu's "Floating button" switch. On unless turned off.
     public static var isEnabled: Bool {
@@ -97,6 +102,7 @@ public final class DevBubble {
         controller.view.addSubview(bubble)
         window.rootViewController = controller
         window.frame = CGRect(origin: savedOrigin(), size: CGSize(width: Self.size, height: Self.size))
+        window.alpha = Self.restingAlpha
         window.isHidden = false
         self.window = window
     }
@@ -115,11 +121,15 @@ public final class DevBubble {
         switch state {
         case .began:
             dragStart = window.frame.origin
+            window.alpha = 1
         case .changed:
             window.frame.origin = CGPoint(x: dragStart.x + delta.x, y: dragStart.y + delta.y)
         default:
             let snapped = snap(window.frame.origin)
-            UIView.animate(withDuration: UIAccessibility.isReduceMotionEnabled ? 0 : 0.25) { window.frame.origin = snapped }
+            UIView.animate(withDuration: UIAccessibility.isReduceMotionEnabled ? 0 : 0.25) {
+                window.frame.origin = snapped
+                window.alpha = Self.restingAlpha
+            }
         }
     }
 
@@ -136,14 +146,25 @@ public final class DevBubble {
         let y = min(max(origin.y, a.minY), a.maxY - Self.size)
         UserDefaults.standard.set(right ? "right" : "left", forKey: Self.sideKey)
         UserDefaults.standard.set(a.height > Self.size ? (y - a.minY) / (a.height - Self.size) : 0, forKey: Self.heightKey)
-        return CGPoint(x: right ? a.maxX - Self.size : a.minX, y: y)
+        return CGPoint(x: dockedX(right: right), y: y)
     }
+
+    /// Tucked partly past the screen edge, like a tab, so it sits over the margin.
+    private func dockedX(right: Bool) -> CGFloat {
+        guard let scene else { return 0 }
+        let screen = scene.screen.bounds
+        return right ? screen.maxX - Self.size * (1 - Self.tuck) : screen.minX - Self.size * Self.tuck
+    }
+
+    /// See-through while resting so rows show through; solid while it's being moved.
+    private static let restingAlpha: CGFloat = 0.6
 
     private func savedOrigin() -> CGPoint {
         let a = area
-        let right = (UserDefaults.standard.string(forKey: Self.sideKey) ?? "right") == "right"
-        let fraction = UserDefaults.standard.object(forKey: Self.heightKey) as? Double ?? 0.62
-        return CGPoint(x: right ? a.maxX - Self.size : a.minX, y: a.minY + (a.height - Self.size) * fraction)
+        // Default: the left edge, low, away from the + buttons on the right of every row.
+        let right = (UserDefaults.standard.string(forKey: Self.sideKey) ?? "left") == "right"
+        let fraction = UserDefaults.standard.object(forKey: Self.heightKey) as? Double ?? 0.78
+        return CGPoint(x: dockedX(right: right), y: a.minY + (a.height - Self.size) * fraction)
     }
 
     // MARK: the menu
@@ -181,7 +202,7 @@ private struct DevMenuSheet: View {
     }
 }
 
-/// The dot itself: 48 points, ink with a hammer, a little see-through so it doesn't hide much.
+/// The dot itself: 40 points, ink with a hammer. The window around it is see-through at rest.
 private final class BubbleView: UIView {
     var onTap: (() -> Void)?
     var onHide: (() -> Void)?
@@ -198,7 +219,7 @@ private final class BubbleView: UIView {
         layer.shadowOffset = CGSize(width: 0, height: 2)
 
         let icon = UIImageView(image: UIImage(systemName: "hammer.fill",
-                                              withConfiguration: UIImage.SymbolConfiguration(pointSize: 18, weight: .semibold)))
+                                              withConfiguration: UIImage.SymbolConfiguration(pointSize: 15, weight: .semibold)))
         icon.tintColor = UIColor(Palette.ground)
         icon.contentMode = .center
         icon.frame = bounds
