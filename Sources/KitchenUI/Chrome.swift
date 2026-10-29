@@ -3,6 +3,10 @@ import SwiftUI
 extension View {
     /// Filter chips pinned under the navigation bar, with the soft Liquid Glass scroll edge
     /// so content fades under them. Use KitchenUI's `FilterChip`s inside.
+    ///
+    /// Built on `safeAreaBar`, not `safeAreaInset`: with an inset the scroll edge effect stops
+    /// at the navigation bar, so rows showed through under the chips and the inline title
+    /// (seen in Deals on the phone, Oct 28).
     public func pinnedChips<Chips: View>(@ViewBuilder _ chips: () -> Chips) -> some View {
         modifier(PinnedChips(chips: chips()))
     }
@@ -12,7 +16,7 @@ private struct PinnedChips<Chips: View>: ViewModifier {
     let chips: Chips
     func body(content: Content) -> some View {
         content
-            .safeAreaInset(edge: .top, spacing: 0) {
+            .safeAreaBar(edge: .top, spacing: 0) {
                 ChipRow { chips }
                     .padding(.horizontal, Space.l)
                     .padding(.vertical, Space.xs)
