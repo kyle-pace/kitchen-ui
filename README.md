@@ -33,6 +33,12 @@ free. This package only adds what SwiftUI doesn't have:
   above every screen (its own window, so it floats over sheets too) on the same builds: tap for
   the menu, drag to either edge, long-press to hide until the app reopens; a switch in the menu
   turns it off.
+- **In-app messages:** `InAppMessage` (decoded from the JSON an app gets from Firebase Remote
+  Config, `InAppMessage.decode(_:)`), drawn as `InAppMessageCard` at the top of a screen or
+  `InAppMessageSheet` once over everything. Options: tone (tip, new, heads-up), an https image,
+  up to two buttons with links, which screen (`place`), a last day (`until`) and dev-only
+  (`audience: "dev"`). The app fetches, decides when to show, opens links and counts; KitchenUI
+  never talks to Firebase. Format notes at the top of `Messages.swift`.
 - **Accessibility helpers:** `Announce.say(_:)`, `.lineLimitUnlessLarge(_:)`,
   `.hiddenWhenTextIsLarge()`.
 
