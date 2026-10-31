@@ -76,10 +76,12 @@ public struct SeasonCard: View {
     var hop: Int
     var chevron: Bool
     var fillHeight: Bool
+    var closable: Bool
 
     /// `tint` defaults to the character's own color, or the app's accent for the leaf.
     public init(_ kind: Buddy.Kind?, eyebrow: String, title: String, detail: String? = nil, tint: Color? = nil,
-                mood: Buddy.Mood = .happy, hop: Int = 0, chevron: Bool = true, fillHeight: Bool = false) {
+                mood: Buddy.Mood = .happy, hop: Int = 0, chevron: Bool = true, fillHeight: Bool = false,
+                closable: Bool = false) {
         self.kind = kind
         self.eyebrow = eyebrow
         self.title = title
@@ -89,6 +91,7 @@ public struct SeasonCard: View {
         self.hop = hop
         self.chevron = chevron
         self.fillHeight = fillHeight
+        self.closable = closable
     }
 
     public var body: some View {
@@ -114,7 +117,10 @@ public struct SeasonCard: View {
                 }
             }
             Spacer(minLength: 0)
-            if chevron {
+            if closable {
+                // Room for the X that `.seasonCardClose` lays over this edge.
+                Color.clear.frame(width: 36, height: 1).accessibilityHidden(true)
+            } else if chevron {
                 Image(systemName: "chevron.right")
                     .font(.app(.subheadline, .semibold))
                     .foregroundStyle(Palette.muted)
@@ -134,6 +140,35 @@ public struct SeasonCard: View {
         .overlay(RoundedRectangle(cornerRadius: Radius.large).strokeBorder(tint.opacity(0.35)))
         .contentShape(RoundedRectangle(cornerRadius: Radius.large))
         .accessibilityElement(children: .combine)
+    }
+}
+
+extension View {
+    /// The X on a `SeasonCard(closable: true)`, like the edition banner's: hides the card. Sits on
+    /// top of the card's own button, so both can be tapped; 44 points; read as its own control.
+    /// Apps keep a way back (a small buddy in the top bar) so a hidden season can be found again.
+    public func seasonCardClose(_ label: String = "Hide for this season", action: @escaping () -> Void) -> some View {
+        overlay(alignment: .trailing) {
+            Button(label, systemImage: "xmark", action: action)
+                .labelStyle(.iconOnly)
+                .buttonStyle(.bordered).buttonBorderShape(.circle)
+                .tint(Palette.muted)
+                .frame(minWidth: 44, minHeight: 44)
+                .padding(.trailing, Space.s)
+        }
+    }
+}
+
+/// A season's buddy at toolbar size, for the top-bar button that brings a hidden season back.
+public struct SeasonToolbarMark: View {
+    let kind: Buddy.Kind?
+    let tint: Color?
+    public init(_ kind: Buddy.Kind?, tint: Color? = nil) {
+        self.kind = kind
+        self.tint = tint
+    }
+    public var body: some View {
+        SeasonMark(kind, mood: .happy, size: 30, tint: tint ?? kind?.tint ?? Palette.accent)
     }
 }
 
