@@ -14,6 +14,15 @@ extension Buddy.Kind: CaseIterable {
         }
     }
 
+    /// The character's own color, for a season card's wash when the app has no color from a feed
+    /// (Maitake). Persimmon orange; the jar's leaf green.
+    public var tint: Color {
+        switch self {
+        case .persimmon: BuddyColors.persimmon
+        case .jar: BuddyColors.leaf
+        }
+    }
+
     /// The character for a name, or nil when this version doesn't have it yet (a newer feed can
     /// name a buddy an older app hasn't drawn). Callers show `SeasonMark`'s leaf instead.
     public init?(name: String?) {
@@ -67,13 +76,14 @@ public struct SeasonCard: View {
     var hop: Int
     var chevron: Bool
 
-    public init(_ kind: Buddy.Kind?, eyebrow: String, title: String, detail: String? = nil, tint: Color = Palette.accent,
+    /// `tint` defaults to the character's own color, or the app's accent for the leaf.
+    public init(_ kind: Buddy.Kind?, eyebrow: String, title: String, detail: String? = nil, tint: Color? = nil,
                 mood: Buddy.Mood = .happy, hop: Int = 0, chevron: Bool = true) {
         self.kind = kind
         self.eyebrow = eyebrow
         self.title = title
         self.detail = detail
-        self.tint = tint
+        self.tint = tint ?? kind?.tint ?? Palette.accent
         self.mood = mood
         self.hop = hop
         self.chevron = chevron
