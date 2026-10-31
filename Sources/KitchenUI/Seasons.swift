@@ -75,10 +75,11 @@ public struct SeasonCard: View {
     let mood: Buddy.Mood
     var hop: Int
     var chevron: Bool
+    var fillHeight: Bool
 
     /// `tint` defaults to the character's own color, or the app's accent for the leaf.
     public init(_ kind: Buddy.Kind?, eyebrow: String, title: String, detail: String? = nil, tint: Color? = nil,
-                mood: Buddy.Mood = .happy, hop: Int = 0, chevron: Bool = true) {
+                mood: Buddy.Mood = .happy, hop: Int = 0, chevron: Bool = true, fillHeight: Bool = false) {
         self.kind = kind
         self.eyebrow = eyebrow
         self.title = title
@@ -87,6 +88,7 @@ public struct SeasonCard: View {
         self.mood = mood
         self.hop = hop
         self.chevron = chevron
+        self.fillHeight = fillHeight
     }
 
     public var body: some View {
@@ -120,7 +122,8 @@ public struct SeasonCard: View {
             }
         }
         .padding(Space.l)
-        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        // fillHeight: as tall as the tallest card in a row (a row of seasons), border and all.
+        .frame(maxWidth: .infinity, minHeight: 44, maxHeight: fillHeight ? .infinity : nil, alignment: .leading)
         .background {
             ZStack {
                 RoundedRectangle(cornerRadius: Radius.large).fill(Palette.surface)
