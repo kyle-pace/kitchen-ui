@@ -39,6 +39,12 @@ free. This package only adds what SwiftUI doesn't have:
   up to two buttons with links, which screen (`place`), a last day (`until`) and dev-only
   (`audience: "dev"`). The app fetches, decides when to show, opens links and counts; KitchenUI
   never talks to Firebase. Format notes at the top of `Messages.swift`.
+- **Seasons:** `SeasonCard(kind, eyebrow:title:detail:tint:hop:)`, the card Grocery Deals shows (either app can) while an item from
+  KitchenCatalog's `seasons.json` is in season (the buddy, an uppercase eyebrow, a headline and a line, on a soft wash
+  of the item's color; text stays ink and muted). `SeasonMark` is the buddy or, for items without a character yet, a
+  leaf. `.fallingBuddies(kind, trigger:)` drops a burst of the item on each trigger, like clicking the site's
+  persimmon page (off under Reduce Motion). `Buddy.Kind(name:)` and `.name` map the names in seasons.json and the
+  Deals feed ("persimmon") to characters; an unknown name gives nil, so older apps fall back to the leaf.
 - **Accessibility helpers:** `Announce.say(_:)`, `.lineLimitUnlessLarge(_:)`,
   `.hiddenWhenTextIsLarge()`.
 
