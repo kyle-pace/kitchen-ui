@@ -1,6 +1,6 @@
 import SwiftUI
 
-// Seasonal items (KitchenCatalog's seasons.json): the card both apps show while something is in
+// Seasonal items (KitchenCatalog's seasons.json): the card Grocery Deals shows while something is in
 // season, and the fruit that falls when you tap its buddy. Persimmons are first.
 
 extension Buddy.Kind: CaseIterable {
@@ -15,7 +15,7 @@ extension Buddy.Kind: CaseIterable {
     }
 
     /// The character's own color, for a season card's wash when the app has no color from a feed
-    /// (Maitake). Persimmon orange; the jar's leaf green.
+    /// (no feed). Persimmon orange; the jar's leaf green.
     public var tint: Color {
         switch self {
         case .persimmon: BuddyColors.persimmon
