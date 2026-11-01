@@ -38,6 +38,28 @@ extension View {
     }
 }
 
+extension View {
+    /// A screen that takes over: full screen on iPhone, a sheet on the Mac.
+    @ViewBuilder
+    public func takeover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
+        #if os(iOS)
+        fullScreenCover(isPresented: isPresented, content: content)
+        #else
+        sheet(isPresented: isPresented) { content().frame(minWidth: 520, minHeight: 620) }
+        #endif
+    }
+
+    /// As `takeover`, for an item.
+    @ViewBuilder
+    public func takeover<Item: Identifiable, Content: View>(item: Binding<Item?>, @ViewBuilder content: @escaping (Item) -> Content) -> some View {
+        #if os(iOS)
+        fullScreenCover(item: item, content: content)
+        #else
+        sheet(item: item) { content($0).frame(minWidth: 520, minHeight: 620) }
+        #endif
+    }
+}
+
 extension ToolbarItemPlacement {
     /// Top right on iPhone, the window's toolbar on the Mac.
     public static var trailingBar: ToolbarItemPlacement {

@@ -8,15 +8,19 @@ import AppKit
 /// Accessibility first: every screen should work with VoiceOver, at the largest text sizes,
 /// with Voice Control and Switch Control, and by voice.
 public enum Announce {
+    @MainActor
+    public static var voiceOverRunning: Bool {
+        #if canImport(UIKit)
+        UIAccessibility.isVoiceOverRunning
+        #else
+        NSWorkspace.shared.isVoiceOverEnabled
+        #endif
+    }
+
     /// Tells VoiceOver what just happened, without moving focus.
     @MainActor
     public static func say(_ text: String) {
-        #if canImport(UIKit)
-        let voiceOver = UIAccessibility.isVoiceOverRunning
-        #else
-        let voiceOver = NSWorkspace.shared.isVoiceOverEnabled
-        #endif
-        guard voiceOver, !text.isEmpty else { return }
+        guard voiceOverRunning, !text.isEmpty else { return }
         AccessibilityNotification.Announcement(text).post()
     }
 }
