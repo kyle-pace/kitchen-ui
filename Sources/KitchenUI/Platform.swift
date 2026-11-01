@@ -29,6 +29,14 @@ extension View {
         #endif
     }
 
+    public func cardList() -> some View {
+        #if os(iOS)
+        listStyle(.insetGrouped)
+        #else
+        listStyle(.inset)
+        #endif
+    }
+
     public func numberKeyboard() -> some View {
         #if os(iOS)
         keyboardType(.numberPad)
