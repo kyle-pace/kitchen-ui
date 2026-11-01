@@ -1,6 +1,10 @@
 import StoreKit
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#else
+import AppKit
+#endif
 
 // A developer menu shared by the kitchen apps: onboarding and analytics tools, build details,
 // and a slot for each app's own sections. It appears as a "Developer" row in Settings on
@@ -24,6 +28,7 @@ public enum BuildKind: String, Sendable {
         return .debug
         #else
         if Bundle.main.path(forResource: "embedded", ofType: "mobileprovision") != nil { return .development }
+        if FileManager.default.fileExists(atPath: Bundle.main.bundleURL.appending(path: "Contents/embedded.provisionprofile").path) { return .development }
         if let result = try? await AppTransaction.shared {
             switch result {
             case .verified(let t), .unverified(let t, _):
@@ -127,6 +132,7 @@ public struct DevMenu<AppSections: View>: View {
                 Section { Label(note, systemImage: "checkmark.circle").foregroundStyle(Palette.text(.good)) }
             }
 
+            #if canImport(UIKit)
             Section {
                 Toggle("Floating button", isOn: $bubble)
                     .tint(Palette.accent)
@@ -134,6 +140,7 @@ public struct DevMenu<AppSections: View>: View {
             } footer: {
                 Text("The hammer dot on every screen. Drag it to either edge; long-press it to hide it until the app opens again.")
             }
+            #endif
 
             Section {
                 Button("Show onboarding from the start") { onboarding.present(.welcome) }
@@ -168,7 +175,7 @@ public struct DevMenu<AppSections: View>: View {
                 LabeledContent("Version", value: Self.version)
                 LabeledContent("Bundle ID", value: Bundle.main.bundleIdentifier ?? "")
                 LabeledContent("Build type", value: build?.rawValue ?? "…")
-                LabeledContent("iOS", value: UIDevice.current.systemVersion)
+                LabeledContent("System", value: Self.system)
                 Button("Copy these details") { copy(details, "Details copied.") }
             } header: { Text("This build") }
 
@@ -184,7 +191,7 @@ public struct DevMenu<AppSections: View>: View {
         .scrollContentBackground(.hidden)
         .background(Palette.ground)
         .navigationTitle("Developer")
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineTitle()
         .confirmationDialog("Reset everything?", isPresented: $confirmReset, titleVisibility: .visible) {
             Button("Reset", role: .destructive) {
                 resetAll?()
@@ -207,14 +214,27 @@ public struct DevMenu<AppSections: View>: View {
         return [
             "\(Bundle.main.bundleIdentifier ?? "") \(Self.version)",
             "Build: \(build?.rawValue ?? "unknown")",
-            "iOS \(UIDevice.current.systemVersion), \(UIDevice.current.model)",
+            Self.system,
             "Analytics: \(a.sharing.map { $0 ? "sharing" : "not sharing" } ?? "not asked"), key \(a.hasKey ? "set" : "missing")",
             "Device ID: \(a.deviceID ?? "none")",
         ].joined(separator: "\n")
     }
 
+    private static var system: String {
+        #if canImport(UIKit)
+        "iOS \(UIDevice.current.systemVersion), \(UIDevice.current.model)"
+        #else
+        "macOS \(ProcessInfo.processInfo.operatingSystemVersionString)"
+        #endif
+    }
+
     private func copy(_ text: String, _ message: String) {
+        #if canImport(UIKit)
         UIPasteboard.general.string = text
+        #else
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        #endif
         refresh(message)
     }
 

@@ -1,4 +1,6 @@
 import SwiftUI
+
+#if canImport(UIKit)
 import UIKit
 
 // The floating dev button: a small dot that stays above every screen, sheets and full-screen
@@ -259,3 +261,18 @@ private final class BubbleView: UIView {
         onDrag?(CGPoint(x: point.x - touchStart.x, y: point.y - touchStart.y), g.state)
     }
 }
+
+#else
+
+@MainActor
+public enum DevBubble {
+    /// Nothing to switch on the Mac; here so the dev menu reads the same on both.
+    public static var isEnabled = false
+}
+
+extension View {
+    /// The Mac has no floating button: the dev menu is in Settings.
+    public func devMenuButton<Menu: View>(@ViewBuilder menu: @escaping () -> Menu) -> some View { self }
+}
+
+#endif

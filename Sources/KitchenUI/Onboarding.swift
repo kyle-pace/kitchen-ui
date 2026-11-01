@@ -157,19 +157,18 @@ public struct Onboarding: View {
 
     private var tourView: some View {
         Screen(scrolls: false) {
+            #if os(iOS)
             TabView(selection: $page) {
                 ForEach(Array(pages.enumerated()), id: \.offset) { i, p in
-                    ScrollView {
-                        TourCard(page: p, focused: $titleFocused, isCurrent: i == page)
-                            .padding(.horizontal, Space.xl)
-                            .padding(.vertical, Space.l)
-                    }
-                    .scrollBounceBehavior(.basedOnSize)
-                    .tag(i)
+                    tourPage(p, index: i).tag(i)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(reduceMotion ? nil : .smooth, value: page)
+            #else
+            // No swiping between pages on the Mac: Back and Next do it.
+            tourPage(pages[page], index: page).id(page)
+            #endif
         } top: {
             HStack {
                 PageDots(count: pages.count, current: page)
@@ -189,6 +188,15 @@ public struct Onboarding: View {
                     .buttonStyle(.borderedProminent)
             }
         }
+    }
+
+    private func tourPage(_ p: TourPage, index: Int) -> some View {
+        ScrollView {
+            TourCard(page: p, focused: $titleFocused, isCurrent: index == page)
+                .padding(.horizontal, Space.xl)
+                .padding(.vertical, Space.l)
+        }
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     private var isLastPage: Bool { page >= pages.count - 1 }

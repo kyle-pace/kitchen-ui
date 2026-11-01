@@ -6,7 +6,7 @@ import PackageDescription
 // Everything else should be SwiftUI's own components.
 let package = Package(
     name: "KitchenUI",
-    platforms: [.iOS(.v26)],
+    platforms: [.iOS(.v26), .macOS(.v26)],
     products: [.library(name: "KitchenUI", targets: ["KitchenUI"])],
     targets: [
         .target(name: "KitchenUI", resources: [.copy("Resources/Fonts")]),
