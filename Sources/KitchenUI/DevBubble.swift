@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 // The floating dev button: a small dot that stays above every screen, sheets and full-screen
-// covers included, on Debug, development and TestFlight builds (never App Store builds).
+// covers included, on Debug and development builds (never TestFlight or App Store builds).
 // It rests as a see-through tab on the left edge. Tap it for the dev menu, drag it to either
 // edge, long-press to hide it until the app reopens.
 // The dev menu has a switch to turn it off for good.

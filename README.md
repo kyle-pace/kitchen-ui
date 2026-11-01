@@ -25,7 +25,7 @@ free. This package only adds what SwiftUI doesn't have:
   Settings. No system permission prompts here: ask for those when someone uses the feature.
   The app saves the answer and sends nothing before a yes.
 - **Dev menu:** `DevMenuSection { DevMenu(onboarding:analytics:resetAll:) { app sections } }` in
-  Settings adds a "Developer" row on Debug, development-signed and TestFlight builds (never App
+  Settings adds a "Developer" row on Debug and development-signed builds (never TestFlight or App
   Store builds, see `BuildKind`). Shared rows: show onboarding or the usage question, forget the
   answer, analytics status, device ID and flush, build details, reset everything. Apps add their
   own sections with `DevAction` rows.

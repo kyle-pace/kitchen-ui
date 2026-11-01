@@ -4,7 +4,7 @@ import UIKit
 
 // A developer menu shared by the kitchen apps: onboarding and analytics tools, build details,
 // and a slot for each app's own sections. It appears as a "Developer" row in Settings on
-// Debug, development-signed and TestFlight builds, never on App Store builds.
+// Debug and development-signed builds only, never on TestFlight or App Store builds.
 //
 //     Form { …; DevMenuSection { DevMenu(onboarding: …, analytics: …) { app sections } } }
 
@@ -15,7 +15,7 @@ public enum BuildKind: String, Sendable {
     case testFlight = "TestFlight"
     case appStore = "App Store"
 
-    public var showsDevMenu: Bool { self != .appStore }
+    public var showsDevMenu: Bool { self == .debug || self == .development }
 
     /// Debug from the compiler flag; development-signed builds carry a provisioning profile;
     /// TestFlight and App Store builds don't, and StoreKit tells those two apart.
@@ -65,7 +65,7 @@ public struct DevMenuSection<Menu: View>: View {
                     Label("Developer", systemImage: "hammer")
                 }
             } footer: {
-                Text("\(kind.rawValue) build. Not in the App Store version.")
+                Text("\(kind.rawValue) build. Not in TestFlight or the App Store version.")
             }
         }
     }
