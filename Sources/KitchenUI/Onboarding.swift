@@ -74,10 +74,24 @@ public struct Onboarding: View {
     let buddy: Buddy.Kind
     let appName: String
     let tagline: String
+    let highlights: [Highlight]
     let pages: [TourPage]
     let question: UsageQuestion
     let start: Start
     let onFinish: (OnboardingResult) -> Void
+
+    /// One line on the welcome screen: a symbol and a few words. Up to three, so someone who
+    /// skips the tour still knows what the app is for.
+    public struct Highlight: Identifiable, Sendable {
+        public let id: String
+        public let systemImage: String
+        public let text: String
+        public init(_ text: String, systemImage: String) {
+            self.id = text
+            self.systemImage = systemImage
+            self.text = text
+        }
+    }
 
     @State private var step: Step
     @State private var page = 0
@@ -88,12 +102,13 @@ public struct Onboarding: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var textSize
 
-    public init(buddy: Buddy.Kind, appName: String, tagline: String, pages: [TourPage],
-                question: UsageQuestion, start: Start = .welcome,
+    public init(buddy: Buddy.Kind, appName: String, tagline: String, highlights: [Highlight] = [],
+                pages: [TourPage], question: UsageQuestion, start: Start = .welcome,
                 onFinish: @escaping (OnboardingResult) -> Void) {
         self.buddy = buddy
         self.appName = appName
         self.tagline = tagline
+        self.highlights = Array(highlights.prefix(3))
         self.pages = pages
         self.question = question
         self.start = start
@@ -141,6 +156,24 @@ public struct Onboarding: View {
                         .foregroundStyle(Palette.body)
                 }
                 .multilineTextAlignment(.center)
+                if !highlights.isEmpty {
+                    VStack(alignment: .leading, spacing: Space.m) {
+                        ForEach(highlights) { h in
+                            Label {
+                                Text(h.text).font(.app(.body)).foregroundStyle(Palette.ink)
+                            } icon: {
+                                Image(systemName: h.systemImage)
+                                    .font(.app(.body, .semibold))
+                                    .foregroundStyle(Palette.accent)
+                                    .frame(width: 28)
+                            }
+                            .frame(minHeight: 28)
+                        }
+                    }
+                    .padding(.top, Space.s)
+                    .frame(maxWidth: 360, alignment: .leading)
+                    .accessibilityElement(children: .combine)
+                }
             }
             .padding(.horizontal, Space.xl)
             .frame(maxWidth: .infinity)
@@ -347,7 +380,7 @@ private struct TourCard: View {
                 .font(.system(size: textSize.isAccessibilitySize ? 44 : 64, weight: .regular))
                 .foregroundStyle(Palette.accent)
                 .frame(width: textSize.isAccessibilitySize ? 96 : 140, height: textSize.isAccessibilitySize ? 96 : 140)
-                .background(Palette.fill(.good), in: Circle())
+                .background(Palette.accent.opacity(0.12), in: Circle())
                 .accessibilityHidden(true)
                 .padding(.top, Space.xl)
             VStack(spacing: Space.m) {
@@ -378,6 +411,7 @@ private struct FocusIf: ViewModifier {
 private struct PageDots: View {
     let count: Int
     let current: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: Space.s) {
@@ -387,7 +421,7 @@ private struct PageDots: View {
                     .frame(width: i == current ? 20 : 8, height: 8)
             }
         }
-        .animation(.smooth, value: current)
+        .animation(reduceMotion ? nil : .smooth, value: current)
         .accessibilityElement()
         .accessibilityLabel("Page \(current + 1) of \(count)")
     }

@@ -9,17 +9,21 @@ free. This package only adds what SwiftUI doesn't have:
 
 - **Type:** Atkinson Hyperlegible Next (Braille Institute; OFL), scaling with Dynamic Type.
   Call `KitchenUI.registerFonts()` once at launch, then `.font(.app(.body))` or `.app(17, .semibold)`.
-- **Color:** `Palette` tokens with light and dark values. One accent for now; an app can
-  override it with `Palette.accent = …` before its first view loads.
+- **Color:** `Palette` tokens with light and dark values. The neutrals and the tones (good,
+  warn, bad, neutral, info) are the same in both apps; each app picks its accent once in its
+  App `init` with `Palette.use(.herb)` (Maitake, the jar's green) or `Palette.use(.persimmon)`
+  (Deals, the fruit on its icon). Both presets meet WCAG AA on `ground` and `surface` in light
+  and dark, and their `onAccent` text does too; the numbers are in `Palette.swift`.
 - **Shape and space:** `Radius`, `Space`.
 - **Components:** `FilterChip`, `ChipRow`, `Badge` (shape + label + tone, never color alone),
   `Card`, `SectionHeader`, `FlowLayout`, `AdaptiveStack`.
 - **Appearance:** `.kitchenAppearance()` on the root view applies the Light/Dark and text size
   people choose in the app (both follow the iPhone by default); `AppearanceSettings()` is the
   Settings rows, wrapped in the app's own `Section`.
-- **Onboarding:** `Onboarding(buddy:appName:tagline:pages:question:start:onFinish:)`, the first-run
-  flow both apps use: a welcome, a tour of `TourPage`s, then a `UsageQuestion` about anonymous
-  analytics. Everything but the question can be skipped from every screen; the question has two
+- **Onboarding:** `Onboarding(buddy:appName:tagline:highlights:pages:question:start:onFinish:)`,
+  the first-run flow both apps use: a welcome (with up to three `Highlight` lines, so the point
+  of the app lands even if the tour is skipped), a tour of `TourPage`s, then a `UsageQuestion`
+  about anonymous analytics. Everything but the question can be skipped from every screen; the question has two
   equal buttons and nothing chosen ahead of time. `start: .question` asks only the question
   (people who used the app before onboarding existed); `.tourOnly` replays the tour from
   Settings. No system permission prompts here: ask for those when someone uses the feature.
