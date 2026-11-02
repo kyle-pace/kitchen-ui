@@ -159,15 +159,20 @@ public struct Onboarding: View {
                 if !highlights.isEmpty {
                     VStack(alignment: .leading, spacing: Space.m) {
                         ForEach(highlights) { h in
-                            Label {
+                            if textSize.isAccessibilitySize {
+                                // The words get the whole width; a scaled-up symbol only crowds them.
                                 Text(h.text).font(.app(.body)).foregroundStyle(Palette.ink)
-                            } icon: {
-                                Image(systemName: h.systemImage)
-                                    .font(.app(.body, .semibold))
-                                    .foregroundStyle(Palette.accent)
-                                    .frame(width: 28)
+                            } else {
+                                Label {
+                                    Text(h.text).font(.app(.body)).foregroundStyle(Palette.ink)
+                                } icon: {
+                                    Image(systemName: h.systemImage)
+                                        .font(.app(.body, .semibold))
+                                        .foregroundStyle(Palette.accent)
+                                        .frame(width: 28)
+                                }
+                                .frame(minHeight: 28)
                             }
-                            .frame(minHeight: 28)
                         }
                     }
                     .padding(.top, Space.s)
