@@ -4,22 +4,20 @@
 #
 #   phone            both apps
 #   phone deals      Deals Dev only
-#   phone maitake    Maitake Dev only ("phone onhand" still works)
+#   phone maitake    Maitake Dev only
 #   phone pull       fast-forward every repo's current branch (skips any with local changes)
 #   phone status     branch and commit of each repo, and whether the iPhone is reachable
 #
 # Builds whatever each repo has checked out. The repos sit side by side in ~/Developer (set
 # KITCHEN_DIR to change): KitchenUI, KitchenCatalog, maitake-pantry-and-recipes and
-# seattle-grocery-deals (a Maitake clone still in the old PantryApp folder is found too). The
+# seattle-grocery-deals. The
 # phone can be plugged in, or paired over Wi-Fi in Xcode's Devices window; either way unlocked
 # and trusted.
 #
 # Install once: ln -sf ~/Developer/KitchenUI/tools/phone ~/.local/bin/phone
 set -e
 DIR="${KITCHEN_DIR:-$HOME/Developer}"
-# Maitake's repo was renamed from on-hand on 2026-10-31; older clones live in PantryApp.
 MAITAKE=maitake-pantry-and-recipes
-[ -d "$DIR/$MAITAKE" ] || [ ! -d "$DIR/PantryApp" ] || MAITAKE=PantryApp
 REPOS="KitchenUI KitchenCatalog $MAITAKE seattle-grocery-deals"
 
 deals() { "$DIR/seattle-grocery-deals/apple/install-on-iphone.sh" "$@"; }
@@ -49,7 +47,6 @@ pull() {
 
 case "${1:-all}" in
   all) deals --no-open && maitake ;;
-  onhand) shift; maitake "$@" ;;
   deals|maitake|pull|status) cmd=$1; shift; $cmd "$@" ;;
   *) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

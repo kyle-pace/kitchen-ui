@@ -68,7 +68,7 @@ Pantry's commits on its `app-scaffold` branch ("Design cleanup: adopt KitchenUIâ
 ## Installing the apps on your iPhone
 
 `tools/phone` builds the dev versions ("Deals Dev", "On Hand Dev", DEV icons) and installs them
-on the plugged-in or Wi-Fi-paired iPhone: `phone`, `phone deals`, `phone onhand`, plus
+on the plugged-in or Wi-Fi-paired iPhone: `phone`, `phone deals`, `phone maitake`, plus
 `phone pull` (fast-forward every repo) and `phone status`. It builds whatever each repo in
 `~/Developer` has checked out. Install once with
 `ln -sf ~/Developer/KitchenUI/tools/phone ~/.local/bin/phone`.
