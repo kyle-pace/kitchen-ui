@@ -4,10 +4,10 @@ import SwiftUI
 // (Firebase Remote Config, parameter `in_app_message`) and hands it here; KitchenUI never talks to
 // Firebase. The message is JSON:
 //
-//   {"id": "2026-11-ipad", "title": "Maitake on iPad", "body": "…",
-//    "button": "Show me", "link": "maitake://tab/plan",
+//   {"id": "2026-11-ipad", "title": "Henwood on iPad", "body": "…",
+//    "button": "Show me", "link": "henwood://tab/plan",
 //    "button2": "Read more", "link2": "https://…",
-//    "tone": "new", "image": "https://…/ipad.png", "imageAlt": "Maitake on an iPad",
+//    "tone": "new", "image": "https://…/ipad.png", "imageAlt": "Henwood on an iPad",
 //    "style": "card", "place": "home", "until": "2026-11-30", "audience": "all"}
 //
 // - id: change it for every new message. A closed message never comes back.

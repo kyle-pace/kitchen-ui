@@ -1,15 +1,15 @@
 #!/bin/sh
 # phone: build the dev versions of the kitchen apps and install them on your iPhone. The dev
-# builds are "Deals Dev" and "Maitake Dev" with a DEV icon, so they sit next to the real apps.
+# builds are "Deals Dev" and "Henwood Dev" with a DEV icon, so they sit next to the real apps.
 #
 #   phone            both apps
 #   phone deals      Deals Dev only
-#   phone maitake    Maitake Dev only
+#   phone henwood    Henwood Dev only
 #   phone pull       fast-forward every repo's current branch (skips any with local changes)
 #   phone status     branch and commit of each repo, and whether the iPhone is reachable
 #
 # Builds whatever each repo has checked out. The repos sit side by side in ~/Developer (set
-# KITCHEN_DIR to change): KitchenUI, KitchenCatalog, maitake-pantry-and-recipes and
+# KITCHEN_DIR to change): KitchenUI, KitchenCatalog, henwood-pantry-and-recipes and
 # seattle-grocery-deals. The
 # phone can be plugged in, or paired over Wi-Fi in Xcode's Devices window; either way unlocked
 # and trusted.
@@ -17,11 +17,11 @@
 # Install once: ln -sf ~/Developer/KitchenUI/tools/phone ~/.local/bin/phone
 set -e
 DIR="${KITCHEN_DIR:-$HOME/Developer}"
-MAITAKE=maitake-pantry-and-recipes
-REPOS="KitchenUI KitchenCatalog $MAITAKE seattle-grocery-deals"
+HENWOOD=henwood-pantry-and-recipes
+REPOS="KitchenUI KitchenCatalog $HENWOOD seattle-grocery-deals"
 
 deals() { "$DIR/seattle-grocery-deals/apple/install-on-iphone.sh" "$@"; }
-maitake() { "$DIR/$MAITAKE/App/install-on-iphone.sh" "$@"; }
+henwood() { "$DIR/$HENWOOD/App/install-on-iphone.sh" "$@"; }
 
 status() {
   for r in $REPOS; do
@@ -46,7 +46,7 @@ pull() {
 }
 
 case "${1:-all}" in
-  all) deals --no-open && maitake ;;
-  deals|maitake|pull|status) cmd=$1; shift; $cmd "$@" ;;
+  all) deals --no-open && henwood ;;
+  deals|henwood|pull|status) cmd=$1; shift; $cmd "$@" ;;
   *) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

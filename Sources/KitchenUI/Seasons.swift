@@ -4,22 +4,24 @@ import SwiftUI
 // season, and the fruit that falls when you tap its buddy. Persimmons are first.
 
 extension Buddy.Kind: CaseIterable {
-    public static let allCases: [Buddy.Kind] = [.persimmon, .jar]
+    public static let allCases: [Buddy.Kind] = [.persimmon, .jar, .hen]
 
     /// The name seasons.json and Grocery Deals' feed use for this character ("persimmon").
     public var name: String {
         switch self {
         case .persimmon: "persimmon"
         case .jar: "jar"
+        case .hen: "hen"
         }
     }
 
     /// The character's own color, for a season card's wash when the app has no color from a feed
-    /// (Maitake). Persimmon orange; the jar's leaf green.
+    /// (Henwood). Persimmon orange; the jar's leaf green.
     public var tint: Color {
         switch self {
         case .persimmon: BuddyColors.persimmon
         case .jar: BuddyColors.leaf
+        case .hen: HenColors.feather
         }
     }
 

@@ -29,6 +29,12 @@ extension Font {
         return .custom(KitchenUI.face(weight ?? defaultWeight), size: size, relativeTo: style)
     }
 
+    /// The display face: Apple's New York serif, for greetings, a wordmark and big moments.
+    /// Scales with Dynamic Type. Henwood's brand uses it; everything else stays `app`.
+    public static func display(_ style: Font.TextStyle, _ weight: Font.Weight = .semibold) -> Font {
+        .system(style, design: .serif, weight: weight)
+    }
+
     /// The app font at a specific size, scaling with Dynamic Type relative to `style`.
     public static func app(_ size: CGFloat, _ weight: Font.Weight = .regular, relativeTo style: Font.TextStyle = .body) -> Font {
         .custom(KitchenUI.face(weight), size: size, relativeTo: style)
