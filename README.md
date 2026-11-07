@@ -11,7 +11,7 @@ free. This package only adds what SwiftUI doesn't have:
   Call `KitchenUI.registerFonts()` once at launch, then `.font(.app(.body))` or `.app(17, .semibold)`.
 - **Color:** `Palette` tokens with light and dark values. The neutrals and the tones (good,
   warn, bad, neutral, info) are the same in both apps; each app picks its accent once in its
-  App `init` with `Palette.use(.herb)` (Maitake, the jar's green) or `Palette.use(.persimmon)`
+  App `init` with `Palette.use(.herb)` (Henwood, the jar's green) or `Palette.use(.persimmon)`
   (Deals, the fruit on its icon). Both presets meet WCAG AA on `ground` and `surface` in light
   and dark, and their `onAccent` text does too; the numbers are in `Palette.swift`.
 - **Shape and space:** `Radius`, `Space`.
@@ -68,7 +68,7 @@ Pantry's commits on its `app-scaffold` branch ("Design cleanup: adopt KitchenUIâ
 ## Installing the apps on your iPhone
 
 `tools/phone` builds the dev versions ("Deals Dev", "On Hand Dev", DEV icons) and installs them
-on the plugged-in or Wi-Fi-paired iPhone: `phone`, `phone deals`, `phone onhand`, plus
+on the plugged-in or Wi-Fi-paired iPhone: `phone`, `phone deals`, `phone henwood`, plus
 `phone pull` (fast-forward every repo) and `phone status`. It builds whatever each repo in
 `~/Developer` has checked out. Install once with
 `ln -sf ~/Developer/KitchenUI/tools/phone ~/.local/bin/phone`.

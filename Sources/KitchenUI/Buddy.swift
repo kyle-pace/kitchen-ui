@@ -1,11 +1,11 @@
 import SwiftUI
 
 /// The apps' small characters: an everyday kitchen object with two eyes and a mouth. Deals has
-/// the persimmon from its icon; Pantry has the jar with a sprout. Drawn with shapes, so they
+/// the persimmon from its icon; Henwood has the hen from its icon (HenBuddy); the jar with a sprout came first. Drawn with shapes, so they
 /// scale, recolor for dark mode and animate. Use them for rare moments (waits, empty screens,
 /// errors, finishing something), never on routine taps.
 public struct Buddy: View {
-    public enum Kind: Sendable { case persimmon, jar }
+    public enum Kind: Sendable { case persimmon, jar, hen }
     public enum Mood: Sendable { case neutral, happy, thinking, sleepy, sad, surprised }
 
     let kind: Kind
@@ -25,13 +25,18 @@ public struct Buddy: View {
 
     public var body: some View {
         ZStack {
-            BuddyBody(kind: kind)
-            BuddyFace(mood: mood, size: size, animate: !reduceMotion)
-                .frame(width: size * 0.56, height: size * 0.3)
-                .offset(y: faceOffset)
+            if kind == .hen {
+                // Henwood's hen acts out its own moods (HenBuddy).
+                HenBuddy(mood: mood, size: size, animate: !reduceMotion)
+            } else {
+                BuddyBody(kind: kind)
+                BuddyFace(mood: mood, size: size, animate: !reduceMotion)
+                    .frame(width: size * 0.56, height: size * 0.3)
+                    .offset(y: faceOffset)
+            }
         }
         .frame(width: size, height: size)
-        .modifier(Wobble(active: mood == .thinking && !reduceMotion))
+        .modifier(Wobble(active: mood == .thinking && kind != .hen && !reduceMotion))
         .keyframeAnimator(initialValue: HopValues(), trigger: hop) { content, v in
             content
                 .offset(y: v.lift * size)
@@ -55,6 +60,7 @@ public struct Buddy: View {
         switch kind {
         case .persimmon: size * 0.12
         case .jar: size * 0.14
+        case .hen: 0
         }
     }
 }
@@ -147,6 +153,8 @@ struct BuddyBody: View {
                         .frame(width: s * 0.05, height: s * 0.12).offset(x: -s * 0.24, y: s * 0.3)
                 }
                 .frame(width: s, height: s)
+            case .hen:
+                Color.clear
             }
         }
     }
