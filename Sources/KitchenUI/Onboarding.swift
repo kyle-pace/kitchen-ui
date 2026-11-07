@@ -22,14 +22,18 @@ public struct TourPage: Identifiable, Sendable {
     /// When set, the card shows the app's buddy in this mood, with the symbol as a small badge,
     /// instead of the symbol alone.
     public let mood: Buddy.Mood?
+    /// Things to say, shown as chat bubbles under the message. Up to four.
+    public let examples: [String]
 
     /// `id` is a short stable name ("list", "alerts") the app can use in its own analytics.
-    public init(_ id: String, systemImage: String, title: String, message: String, mood: Buddy.Mood? = nil) {
+    public init(_ id: String, systemImage: String, title: String, message: String, mood: Buddy.Mood? = nil,
+                examples: [String] = []) {
         self.id = id
         self.systemImage = systemImage
         self.title = title
         self.message = message
         self.mood = mood
+        self.examples = Array(examples.prefix(4))
     }
 }
 
@@ -268,22 +272,25 @@ public struct Onboarding: View {
 
     private var questionView: some View {
         Screen {
-            VStack(alignment: .leading, spacing: Space.l) {
-                HStack {
-                    Spacer()
-                    Buddy(buddy, mood: .neutral, size: textSize.isAccessibilitySize ? 64 : 88)
-                    Spacer()
+            VStack(alignment: .leading, spacing: Space.m) {
+                // The buddy beside the title instead of above it, so the whole question fits
+                // without scrolling at the default text size.
+                HStack(alignment: .center, spacing: Space.m) {
+                    Text(question.title)
+                        .font(titleFont(.title))
+                        .foregroundStyle(Palette.ink)
+                        .accessibilityAddTraits(.isHeader)
+                        .accessibilityFocused($titleFocused)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if !textSize.isAccessibilitySize {
+                        Buddy(buddy, mood: .neutral, size: 64)
+                    }
                 }
-                Text(question.title)
-                    .font(titleFont(.title))
-                    .foregroundStyle(Palette.ink)
-                    .accessibilityAddTraits(.isHeader)
-                    .accessibilityFocused($titleFocused)
                 Text(question.message)
                     .font(.app(.body))
                     .foregroundStyle(Palette.body)
-                Card {
-                    VStack(alignment: .leading, spacing: Space.l) {
+                Card(padding: Space.m) {
+                    VStack(alignment: .leading, spacing: Space.m) {
                         UsageList(title: "What's shared", systemImage: "checkmark.circle", tone: .good, items: question.shared)
                         Divider().overlay(Palette.divider)
                         UsageList(title: "Never shared", systemImage: "xmark.circle", tone: .bad, items: question.neverShared)
@@ -294,7 +301,7 @@ public struct Onboarding: View {
                     .foregroundStyle(Palette.muted)
             }
             .padding(.horizontal, Space.xl)
-            .padding(.vertical, Space.l)
+            .padding(.vertical, Space.m)
         } buttons: {
             // Same style and size on purpose: neither answer is the "right" one.
             Button { finish(true) } label: { wide(question.shareButton) }
@@ -397,7 +404,7 @@ private struct TourCard: View {
     @Environment(\.dynamicTypeSize) private var textSize
     @State private var hop = 0
 
-    private var art: CGFloat { textSize.isAccessibilitySize ? 96 : 140 }
+    private var art: CGFloat { textSize.isAccessibilitySize ? 96 : (page.examples.isEmpty ? 140 : 112) }
 
     var body: some View {
         VStack(spacing: Space.xl) {
@@ -436,6 +443,23 @@ private struct TourCard: View {
                     .foregroundStyle(Palette.body)
             }
             .multilineTextAlignment(.center)
+            if !page.examples.isEmpty {
+                // Things to try, as the chat would show them: right-aligned bubbles in the accent.
+                VStack(alignment: .trailing, spacing: Space.s) {
+                    ForEach(Array(page.examples.enumerated()), id: \.offset) { _, line in
+                        Text(line)
+                            .font(.app(.body))
+                            .foregroundStyle(Palette.ink)
+                            .padding(.horizontal, Space.m)
+                            .padding(.vertical, Space.s)
+                            .background(Palette.accent.opacity(0.14), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                }
+                .frame(maxWidth: 340)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("For example: " + page.examples.joined(separator: ", "))
+            }
         }
         .frame(maxWidth: .infinity)
     }
