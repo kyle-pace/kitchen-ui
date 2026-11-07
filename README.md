@@ -11,8 +11,8 @@ free. This package only adds what SwiftUI doesn't have:
   Call `KitchenUI.registerFonts()` once at launch, then `.font(.app(.body))` or `.app(17, .semibold)`.
 - **Color:** `Palette` tokens with light and dark values. The neutrals and the tones (good,
   warn, bad, neutral, info) are the same in both apps; each app picks its accent once in its
-  App `init` with `Palette.use(.herb)` (Henwood, the jar's green) or `Palette.use(.persimmon)`
-  (Deals, the fruit on its icon). Both presets meet WCAG AA on `ground` and `surface` in light
+  App `init` with `Palette.use(_:neutrals:)`: Henwood takes moss on oat, Deals `Palette.use(.rain, neutrals: .harbor)`
+  (its "Puget evening" palette, with the crow). Both presets meet WCAG AA on `ground` and `surface` in light
   and dark, and their `onAccent` text does too; the numbers are in `Palette.swift`.
 - **Shape and space:** `Radius`, `Space`.
 - **Components:** `FilterChip`, `ChipRow`, `Badge` (shape + label + tone, never color alone),
