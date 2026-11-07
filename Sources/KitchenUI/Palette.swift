@@ -19,8 +19,9 @@ public enum Palette {
     nonisolated(unsafe) public static var line = Neutrals.stone.line
     nonisolated(unsafe) public static var divider = Neutrals.stone.divider
 
-    /// Backgrounds, text and lines, light and dark. Grocery Deals uses the cool `stone`;
-    /// Henwood uses the warm `oat` from its brand guide. Every text color meets AA on ground,
+    /// Backgrounds, text and lines, light and dark. Grocery Deals uses the harbor blues of its
+    /// "Puget evening" palette (it used the cool `stone` before); Henwood uses the warm `oat`
+    /// from its brand guide. Every text color meets AA on ground,
     /// surface and raised in both modes.
     public struct Neutrals: Sendable {
         public let ground: Color
@@ -52,6 +53,19 @@ public enum Palette {
             muted: Color(light: 0x5E6661, dark: 0xA3ABA6),
             line: Color(light: 0xD5D7D1, dark: 0x3A3F3C),
             divider: Color(light: 0xECECE8, dark: 0x2A2E2B))
+
+        /// Grocery Deals, "Puget evening": mist paper and harbor ink, harbor blue at night.
+        /// Ink 15.7:1, body 8.2:1, muted 5.5:1 on ground (5.0:1 on raised); dark ink 15.7:1,
+        /// body 11.7:1, muted 8.7:1 on ground (6.3:1 on raised).
+        public static let harbor = Neutrals(
+            ground: Color(light: 0xEEF3F6, dark: 0x0F1A24),
+            surface: Color(light: 0xFFFFFF, dark: 0x172633),
+            raised: Color(light: 0xE1E9EF, dark: 0x223445),
+            ink: Color(light: 0x0F1A24, dark: 0xEEF3F6),
+            body: Color(light: 0x3A4A57, dark: 0xC9D4DC),
+            muted: Color(light: 0x536472, dark: 0xA9B8C4),
+            line: Color(light: 0xCCD7E0, dark: 0x2A3D4E),
+            divider: Color(light: 0xE3EAF0, dark: 0x1E2F3E))
 
         /// Henwood: oat paper and bark ink. Ink 13.9:1, body 8.5:1, muted 5.5:1 on ground;
         /// dark ink 16.0:1, body 11.6:1, muted 7.5:1.
@@ -94,7 +108,13 @@ public enum Palette {
                                         onAccent: Color(light: 0xFFFFFF, dark: 0x15200E),
                                         inverseAccent: Color(light: 0xB9D39E, dark: 0x4A6636))
 
-        /// Deals: a deep persimmon, the fruit on its icon, cooked down far enough to carry text.
+        /// Deals, "Puget evening": rain blue. 6.9:1 on ground, 7.7:1 on white; dark 9.0:1 on
+        /// ground, 7.9:1 on surface. White on it 7.7:1; the harbor ink on the dark rain blue 9.0:1.
+        public static let rain = Accent(accent: Color(light: 0x24577A, dark: 0x6CC4E8),
+                                        onAccent: Color(light: 0xFFFFFF, dark: 0x0F1A24),
+                                        inverseAccent: Color(light: 0x6CC4E8, dark: 0x24577A))
+
+        /// Deals until 2026-11-06: a deep persimmon, the fruit on its old icon, cooked down far enough to carry text.
         /// 5.7:1 on white, 5.2:1 on ground; dark 8.9:1 on ground, 7.9:1 on surface. White on
         /// it 5.7:1; the dark ink on the dark persimmon 8.5:1.
         public static let persimmon = Accent(accent: Color(light: 0xB04418, dark: 0xF5A06A),

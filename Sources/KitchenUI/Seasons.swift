@@ -4,7 +4,7 @@ import SwiftUI
 // season, and the fruit that falls when you tap its buddy. Persimmons are first.
 
 extension Buddy.Kind: CaseIterable {
-    public static let allCases: [Buddy.Kind] = [.persimmon, .jar, .hen]
+    public static let allCases: [Buddy.Kind] = [.persimmon, .jar, .hen, .crow]
 
     /// The name seasons.json and Grocery Deals' feed use for this character ("persimmon").
     public var name: String {
@@ -12,6 +12,7 @@ extension Buddy.Kind: CaseIterable {
         case .persimmon: "persimmon"
         case .jar: "jar"
         case .hen: "hen"
+        case .crow: "crow"
         }
     }
 
@@ -22,6 +23,7 @@ extension Buddy.Kind: CaseIterable {
         case .persimmon: BuddyColors.persimmon
         case .jar: BuddyColors.leaf
         case .hen: HenColors.feather
+        case .crow: CrowColors.evening
         }
     }
 

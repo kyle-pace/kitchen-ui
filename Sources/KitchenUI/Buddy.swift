@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// The apps' small characters: an everyday kitchen object with two eyes and a mouth. Deals has
-/// the persimmon from its icon; Henwood has the hen from its icon (HenBuddy); the jar with a sprout came first. Drawn with shapes, so they
+/// The apps' small characters. Deals has the crow from its icon (CrowBuddy); Henwood has the hen
+/// from its icon (HenBuddy); the persimmon (Deals' first character, now the persimmon season's)
+/// and the jar with a sprout wear `BuddyFace`. Drawn with shapes, so they
 /// scale, recolor for dark mode and animate. Use them for rare moments (waits, empty screens,
 /// errors, finishing something), never on routine taps.
 public struct Buddy: View {
-    public enum Kind: Sendable { case persimmon, jar, hen }
+    public enum Kind: Sendable { case persimmon, jar, hen, crow }
     public enum Mood: Sendable { case neutral, happy, thinking, sleepy, sad, surprised }
 
     let kind: Kind
@@ -28,6 +29,9 @@ public struct Buddy: View {
             if kind == .hen {
                 // Henwood's hen acts out its own moods (HenBuddy).
                 HenBuddy(mood: mood, size: size, animate: !reduceMotion)
+            } else if kind == .crow {
+                // Deals' crow does too (CrowBuddy).
+                CrowBuddy(mood: mood, size: size, animate: !reduceMotion)
             } else {
                 BuddyBody(kind: kind)
                 BuddyFace(mood: mood, size: size, animate: !reduceMotion)
@@ -36,7 +40,7 @@ public struct Buddy: View {
             }
         }
         .frame(width: size, height: size)
-        .modifier(Wobble(active: mood == .thinking && kind != .hen && !reduceMotion))
+        .modifier(Wobble(active: mood == .thinking && kind != .hen && kind != .crow && !reduceMotion))
         .keyframeAnimator(initialValue: HopValues(), trigger: hop) { content, v in
             content
                 .offset(y: v.lift * size)
@@ -60,7 +64,7 @@ public struct Buddy: View {
         switch kind {
         case .persimmon: size * 0.12
         case .jar: size * 0.14
-        case .hen: 0
+        case .hen, .crow: 0
         }
     }
 }
@@ -153,7 +157,7 @@ struct BuddyBody: View {
                         .frame(width: s * 0.05, height: s * 0.12).offset(x: -s * 0.24, y: s * 0.3)
                 }
                 .frame(width: s, height: s)
-            case .hen:
+            case .hen, .crow:
                 Color.clear
             }
         }
@@ -258,6 +262,7 @@ struct Mouth: Shape {
 
 #Preview("Buddies") {
     VStack(spacing: 24) {
+        HStack { ForEach([Buddy.Mood.neutral, .happy, .thinking], id: \.self) { Buddy(.crow, mood: $0) } }
         HStack { ForEach([Buddy.Mood.neutral, .happy, .thinking], id: \.self) { Buddy(.persimmon, mood: $0) } }
         HStack { ForEach([Buddy.Mood.sleepy, .sad, .surprised], id: \.self) { Buddy(.jar, mood: $0) } }
     }
