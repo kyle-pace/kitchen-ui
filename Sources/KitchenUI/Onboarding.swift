@@ -19,13 +19,17 @@ public struct TourPage: Identifiable, Sendable {
     public let systemImage: String
     public let title: String
     public let message: String
+    /// When set, the card shows the app's buddy in this mood, with the symbol as a small badge,
+    /// instead of the symbol alone.
+    public let mood: Buddy.Mood?
 
     /// `id` is a short stable name ("list", "alerts") the app can use in its own analytics.
-    public init(_ id: String, systemImage: String, title: String, message: String) {
+    public init(_ id: String, systemImage: String, title: String, message: String, mood: Buddy.Mood? = nil) {
         self.id = id
         self.systemImage = systemImage
         self.title = title
         self.message = message
+        self.mood = mood
     }
 }
 
@@ -78,6 +82,8 @@ public struct Onboarding: View {
     let pages: [TourPage]
     let question: UsageQuestion
     let start: Start
+    /// Titles in the display face (`Font.display`) instead of the app font. Henwood's brand.
+    let displayTitles: Bool
     let onFinish: (OnboardingResult) -> Void
 
     /// One line on the welcome screen: a symbol and a few words. Up to three, so someone who
@@ -103,7 +109,7 @@ public struct Onboarding: View {
     @Environment(\.dynamicTypeSize) private var textSize
 
     public init(buddy: Buddy.Kind, appName: String, tagline: String, highlights: [Highlight] = [],
-                pages: [TourPage], question: UsageQuestion, start: Start = .welcome,
+                pages: [TourPage], question: UsageQuestion, start: Start = .welcome, displayTitles: Bool = false,
                 onFinish: @escaping (OnboardingResult) -> Void) {
         self.buddy = buddy
         self.appName = appName
@@ -112,6 +118,7 @@ public struct Onboarding: View {
         self.pages = pages
         self.question = question
         self.start = start
+        self.displayTitles = displayTitles
         self.onFinish = onFinish
         let first: Step = switch start {
         case .welcome: .welcome
@@ -147,7 +154,7 @@ public struct Onboarding: View {
                     .task { try? await Task.sleep(for: .milliseconds(350)); hop += 1 }
                 VStack(spacing: Space.m) {
                     Text("Welcome to \(appName)")
-                        .font(.app(.largeTitle))
+                        .font(titleFont(.largeTitle))
                         .foregroundStyle(Palette.ink)
                         .accessibilityAddTraits(.isHeader)
                         .accessibilityFocused($titleFocused)
@@ -229,12 +236,16 @@ public struct Onboarding: View {
     }
 
     private func tourPage(_ p: TourPage, index: Int) -> some View {
-        ScrollView {
-            TourCard(page: p, focused: $titleFocused, isCurrent: index == page)
-                .padding(.horizontal, Space.xl)
-                .padding(.vertical, Space.l)
+        // Centered in the space above the buttons when it fits; scrolls at large text sizes.
+        GeometryReader { space in
+            ScrollView {
+                TourCard(page: p, buddy: buddy, titleFont: titleFont(.title), focused: $titleFocused, isCurrent: index == page)
+                    .padding(.horizontal, Space.xl)
+                    .padding(.vertical, Space.l)
+                    .frame(minHeight: space.size.height)
+            }
+            .scrollBounceBehavior(.basedOnSize)
         }
-        .scrollBounceBehavior(.basedOnSize)
     }
 
     private var isLastPage: Bool { page >= pages.count - 1 }
@@ -264,7 +275,7 @@ public struct Onboarding: View {
                     Spacer()
                 }
                 Text(question.title)
-                    .font(.app(.title))
+                    .font(titleFont(.title))
                     .foregroundStyle(Palette.ink)
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityFocused($titleFocused)
@@ -294,6 +305,10 @@ public struct Onboarding: View {
     }
 
     // MARK: helpers
+
+    private func titleFont(_ style: Font.TextStyle) -> Font {
+        displayTitles ? .display(style, .bold) : .app(style)
+    }
 
     private var slide: AnyTransition {
         reduceMotion ? .opacity : .asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
@@ -372,25 +387,47 @@ extension Screen where Top == EmptyView {
     }
 }
 
-/// One tour card: a big symbol, a title and a sentence or two.
+/// One tour card: the buddy (or a big symbol), a title and a sentence or two.
 private struct TourCard: View {
     let page: TourPage
+    let buddy: Buddy.Kind
+    let titleFont: Font
     var focused: AccessibilityFocusState<Bool>.Binding
     let isCurrent: Bool
     @Environment(\.dynamicTypeSize) private var textSize
+    @State private var hop = 0
+
+    private var art: CGFloat { textSize.isAccessibilitySize ? 96 : 140 }
 
     var body: some View {
         VStack(spacing: Space.xl) {
-            Image(systemName: page.systemImage)
-                .font(.system(size: textSize.isAccessibilitySize ? 44 : 64, weight: .regular))
-                .foregroundStyle(Palette.accent)
-                .frame(width: textSize.isAccessibilitySize ? 96 : 140, height: textSize.isAccessibilitySize ? 96 : 140)
-                .background(Palette.accent.opacity(0.12), in: Circle())
-                .accessibilityHidden(true)
-                .padding(.top, Space.xl)
+            Group {
+                if let mood = page.mood {
+                    // The buddy acting the page out, with the feature's symbol as a badge.
+                    Buddy(buddy, mood: mood, size: art * 0.86, hop: hop)
+                        .frame(width: art, height: art)
+                        .background(Palette.accent.opacity(0.10), in: Circle())
+                        .overlay(alignment: .bottomTrailing) {
+                            Image(systemName: page.systemImage)
+                                .font(.system(size: art * 0.16, weight: .semibold))
+                                .foregroundStyle(Palette.onAccent)
+                                .frame(width: art * 0.34, height: art * 0.34)
+                                .background(Palette.accent, in: Circle())
+                                .overlay(Circle().strokeBorder(Palette.ground, lineWidth: 3))
+                        }
+                        .onChange(of: isCurrent, initial: true) { if isCurrent { hop += 1 } }
+                } else {
+                    Image(systemName: page.systemImage)
+                        .font(.system(size: textSize.isAccessibilitySize ? 44 : 64, weight: .regular))
+                        .foregroundStyle(Palette.accent)
+                        .frame(width: art, height: art)
+                        .background(Palette.accent.opacity(0.12), in: Circle())
+                }
+            }
+            .accessibilityHidden(true)
             VStack(spacing: Space.m) {
                 Text(page.title)
-                    .font(.app(.title))
+                    .font(titleFont)
                     .foregroundStyle(Palette.ink)
                     .accessibilityAddTraits(.isHeader)
                     .modifier(FocusIf(active: isCurrent, focused: focused))
